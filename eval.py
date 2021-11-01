@@ -3,20 +3,15 @@ from data import *
 from model import *
 from utils import *
 from sklearn.cluster import KMeans
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 
 
-def loss_supervised(ae,  alpha): # penalize could be exclusive Lasso
-    def calc_loss(logits_est, labels_true):
-        cross_entropy = tf.reduce_mean(input_tensor=-tf.reduce_sum(input_tensor=labels_true * tf.math.log(logits_est + 1e-16), axis=[1]))
-        weight_1 = ae.encoder.layers[1].get_weights()
-        l21 = tf.reduce_sum(input_tensor=tf.sqrt(tf.reduce_sum(input_tensor=tf.pow(weight_1, 2), axis=1)))
-
-        penalty = l21
-
-        loss = tf.reduce_mean(input_tensor=cross_entropy) + penalty*alpha
-        return loss
-    return calc_loss
+def loss_supervised(alpha=0):
+    def custom_loss(logits_est, labels_true):
+        loss_fun = tf.keras.losses.CategoricalCrossentropy()
+        return loss_fun(logits_est, labels_true)
+    return custom_loss
 
 def loss_supervised1(logits_est, labels_true, ae,  alpha): # penalize could be exclusive Lasso
 
@@ -29,7 +24,6 @@ def loss_supervised1(logits_est, labels_true, ae,  alpha): # penalize could be e
     loss = tf.reduce_mean(input_tensor=cross_entropy) + penalty*alpha
     return loss, penalty, cross_entropy
 
-
 def loss_supervised_unsupervised(ae, logits, labels, hidden, M, FLAGS):
     ls, penalty, cross_entropy = loss_supervised(logits, labels, ae, FLAGS.alpha)
     diff = hidden - M
@@ -38,9 +32,13 @@ def loss_supervised_unsupervised(ae, logits, labels, hidden, M, FLAGS):
     loss = ls + FLAGS.beta * lk
     return loss, lk, penalty, cross_entropy
 
-
-
 def evaluation(logits, labels):
+    y_pred = tf.argmax(input=logits, axis=1)
+    y_true = tf.argmax(input=labels, axis=1)
+    print("accuracy:",accuracy_score(y_pred,y_true))
+    print("precision:",precision_score(y_pred,y_true, average="macro"))
+    print("recall:",recall_score(y_pred,y_true, average="macro"))
+    print("f1_score:",f1_score(y_pred,y_true, average="macro"))
     pred_temp = tf.equal(tf.argmax(input=logits, axis=1), tf.argmax(input=labels, axis=1))
     num = pred_temp.shape[0]
     correct = tf.reduce_mean(input_tensor=tf.cast(pred_temp, "float"))
@@ -67,8 +65,14 @@ def do_get_hidden1(sess,ae, data_set, n, FLAGS):
 
 def do_validation(ae, data_validation, FLAGS):
     preds = ae.call(data_validation.data)
+    print("~~~validation metrics~~~")
     acc_val = evaluation(preds,data_validation.labels)
     return acc_val, preds
+
+def test_metrics(y_pred, y_test):
+    print("~~~test metrics~~~")
+    acc_test = evaluation(y_pred,y_test)
+    return acc_test, y_pred
 
 def do_validation1(sess, ae, data_validation, FLAGS):
 

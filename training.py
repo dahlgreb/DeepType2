@@ -3,7 +3,7 @@ from sklearn.cluster import KMeans
 from model import *
 import tensorflow as tf
 from data import *
-from eval import loss_supervised, evaluation, \
+from eval import loss_supervised, evaluation, test_metrics,\
                  loss_supervised_unsupervised, do_get_hidden, do_validation
 from utils import *
 from collections import deque
@@ -64,6 +64,8 @@ def main_supervised_1view(FLAGS):
     data_whole = np.concatenate((data.train.data, data.validation.data, data.test.data), axis = 0)
     target_whole = np.concatenate((data.train.labels, data.validation.labels, data.test.labels), axis = 0)
     data_sets_whole = DataSet(data_whole, target_whole)
+    
+#     acc_test, test_pred = test_metrics(ae_supervised,data.test.data,data.test.labels)
 
     return ae_supervised
 
@@ -79,91 +81,10 @@ def supervised_1view(data, FLAGS, do_val = True):
     output_shape = Input (shape = np.shape(data.train.labels)[1:])
     print('/////////////////////////////:ae_shape',ae_shape)
     ae = Autoencoder(ae_shape)
-    ae.compile(loss=tf.keras.losses.CategoricalCrossentropy(),optimizer='adam',metrics='accuracy')
+    ae.compile(loss=loss_supervised(),optimizer='adam',metrics='accuracy')
     history = ae.fit(data.train.data, data.train.labels, batch_size=FLAGS['batch_size'],epochs=FLAGS['supervised_train_steps'],validation_split=0.1,verbose=True)
     print(ae.summary())
     return ae
-
-def supervised_1view1(data, FLAGS, do_val = True):
-    """
-    :param data: input data
-    :param do_val: whether do validation.
-    :return sess: the current session.
-    :return ae: the trained autoencoder.
-    :return acc: the accuracy on validation/training batch.
-    """
-    if FLAGS['initialize'] == True:
-        file_dir = FLAGS['data_dir'] + 'initialize_encoder.mat'
-        matContents = sio.loadmat(file_dir)
-        AE_initialize = matContents
-
-
-    sess = tf.compat.v1.Session()
-    acc_record = deque([])
-    N_record = 5
-    with sess.graph.as_default():
-        # here we need to perform the parameter selection
-
-
-        ae_shape = FLAGS['NN_dims_1']
-
-        ae = AutoEncoder(ae_shape)
-
-
-        if FLAGS['initialize']:
-            ae._setup_variables(FLAGS['initialize'], AE_initialize)
-
-        input_pl = tf.compat.v1.placeholder(tf.float32, shape=(None, FLAGS['dimension']), name = 'input_pl')
-
-        logits = ae.supervised_net(input_pl, FLAGS['num_hidden_layers']+1)
-
-        labels_placeholder = tf.compat.v1.placeholder(tf.float32,
-                                        shape=(None, FLAGS['num_classes']), name = 'target_pl')
-        alpha_placeholder = tf.compat.v1.placeholder(tf.float32, None, name = 'alpha_pl')
-
-        loss, sp, cr = loss_supervised(logits, labels_placeholder, ae, alpha_placeholder)
-        train_op = tf.compat.v1.train.AdamOptimizer(FLAGS['learning_rate']).minimize(loss)
-        sess.run(tf.compat.v1.global_variables_initializer())
-
-        for step in range(FLAGS['supervised_train_steps']): # gradually increase alpha, for fast convergence
-            alpha = 0. + FLAGS['alpha'] * (1 - np.exp(-(step+0.)/300.))
-            if alpha >= FLAGS['alpha'] * (1.0-1e-2):
-                alpha = FLAGS['alpha']
-            input_feed, target_feed = data.train.next_batch(FLAGS['batch_size'])
-            feed_dict_supervised = {input_pl: input_feed,
-                                    labels_placeholder: target_feed, alpha_placeholder: alpha}
-
-
-            accuracy, est = evaluation(logits, labels_placeholder)
-            sess.run(train_op, feed_dict=feed_dict_supervised)
-
-
-            acc_train, loss_value, penalty, cr_value, estimation = \
-                sess.run([accuracy, loss, sp, cr, est], feed_dict=feed_dict_supervised)
-
-            # Print training process.
-            if (step+1) % FLAGS['display_steps'] == 0 or step+1 == FLAGS['supervised_train_steps'] or step == 0:
-                print(alpha)
-                output ='Train step '+str(step+1)+' minibatch loss: '+ str(loss_value) + ' penalty:' + str(penalty)+ \
-                         ' accuracy: ' + str(acc_train)
-                print(output)
-                acc = acc_train
-                if do_val:
-                    if do_val:
-                        acc_val, _ = do_validation(sess, ae, data.validation, FLAGS)
-                else: acc_val = acc_train
-
-                acc_record.append(acc_val)
-                if len(acc_record) > N_record: acc_record.popleft()
-                else: pass
-
-                acc_val_show = max(acc_record)
-                output = 'accuracy on validation: ' + str(acc_val_show)
-                print(output)
-                acc = acc_val
-
-
-    return sess, acc, ae
 
 
 def main_supervised_unsupervised_1view(ae, sess, FLAGS):

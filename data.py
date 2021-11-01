@@ -177,6 +177,37 @@ def load_biology_data_for_test(FLAGS):
 
     return index, data_whole, targets_whole
 
+def load_biology_data_for_test_really(FLAGS):
+    train_dir = "./data/BRCA1View1000.mat"
+
+    dimension = 1000
+    matContents = sio.loadmat(train_dir) # load the data from mat file
+
+    data = matContents['data']
+    [n_dim, n_sample] = data.shape
+    for i in range(n_dim):
+        m1 = min(data[i,:])
+        m2 = max(data[i,:])
+        data[i, :] =( data[i,:] - m1)/(m2 - m1)
+
+    targets = matContents['targets']
+    index = np.random.permutation(n_sample)
+    data = data[:, index]
+    targets = targets[index]
+    n_label = len(np.unique(targets))
+    Y = np.zeros([n_sample, n_label])
+    targets = targets - 1
+    for target in np.unique(targets):
+        id = (targets == target).nonzero()[0]
+        Y[id, target] = 1
+    X = data.T
+    X = X[:, 0:dimension]
+    data_whole = X
+    targets_whole = np.float32(Y)
+    
+    data_set = DataSet(data_whole, targets_whole)
+    return data_set, index
+
 
 
 

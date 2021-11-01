@@ -1,21 +1,7 @@
-"""
-Runpu Chen 2019
-DeepType.py
-
-Usage:
-
-    Run in command line with required command arguments:
-    	python DeepType.py
-
-
-"""
-
-
-
 import tensorflow as tf
 from training import *
 from flags import set_flags
-from eval import do_inference_main
+from eval import do_inference_main, test_metrics
 import pickle
 import os
 
@@ -31,9 +17,8 @@ if __name__ == '__main__':
 
 
     # create autoencoder and perform training
-
-
-    AE= main_supervised_1view(FLAGS)
+    
+    AE, data= main_supervised_1view(FLAGS)
 
     _, _, _, _, _, AE_pretrain, _ = \
         do_inference_main(AE, FLAGS)
@@ -52,11 +37,11 @@ if __name__ == '__main__':
 
 
     # save mat
-    sio.savemat(FLAGS.results_dir+'encoder.mat', {'AE_final':AE_final,'acc_whole': acc_whole,'true_targets': true_targets,
+    sio.savemat(FLAGS["results_dir"]+'encoder.mat', {'AE_final':AE_final,'acc_whole': acc_whole,'true_targets': true_targets,
         'target_predicted': target_predicted, 'ass_total': ass_total, 'manifold': manifold,'index_total': index_total})
 
     # save pickle
-    pickle_out = open(FLAGS.results_dir + 'encoder.pickle', 'wb')
+    pickle_out = open(FLAGS["results_dir"] + 'encoder.pickle', 'wb')
     pickle.dump([AE_final, acc_whole, target_predicted, ass_total, index_total], pickle_out)
     print('Processing done!')
 

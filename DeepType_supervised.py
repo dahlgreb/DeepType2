@@ -25,12 +25,5 @@ if __name__ == '__main__':
     y_pred = AE.call(data.test.data)
     test_metrics(y_pred, data.test.labels)
 
-
-
-
-
-
-
-
-
+    preds, index = do_inference_main(AE, FLAGS)
 

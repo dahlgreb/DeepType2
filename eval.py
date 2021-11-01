@@ -134,7 +134,7 @@ def do_inference_main(AE, FLAGS):
     labels = np.nonzero(true_targets == 1)[1]
     title = FLAGS['results_dir'] + 'FinalTrainedFinal'
     VisualizeHidden(X_TSNE_trained, X_PCA_trained, labels, types, title)
-    print('returned')
+    return target_predicted,index
 
 def do_inference_main1(AE, sess, FLAGS):
     # data is data_whole

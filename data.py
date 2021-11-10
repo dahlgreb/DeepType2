@@ -31,6 +31,9 @@ class DataSet(object):
   @property
   def start_index(self):
       return self._index_in_epoch
+  @labels.setter
+  def labels(self,values):
+    self._labels = values
 
 
   def next_batch(self, batch_size, UNSUPERVISED = False):
@@ -131,6 +134,7 @@ def load_biology_data(FLAGS):
     for target in np.unique(targets):
         id = (targets == target).nonzero()[0]
         Y[id, target] = 1
+    Y[:,0]=index
     X = data.T
     X = X[:, 0:dimension]
     data_train = X[0:train_size, :]

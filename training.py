@@ -4,7 +4,7 @@ from model import *
 import tensorflow as tf
 from data import *
 from eval import loss_supervised, evaluation, test_metrics,\
-                 loss_supervised_unsupervised, do_get_hidden, do_validation
+                 loss_supervised_unsupervised, do_get_hidden, do_validation, accuracy
 from utils import *
 from collections import deque
 
@@ -54,7 +54,7 @@ def supervised_1view(data, FLAGS, do_val = True):
     output_shape = Input (shape = np.shape(data.train.labels)[1:])
     print('/////////////////////////////:ae_shape',ae_shape)
     ae = Autoencoder(ae_shape)
-    ae.compile(loss=loss_supervised(),optimizer='adam',metrics='accuracy',run_eagerly=True)
+    ae.compile(loss=loss_supervised(),optimizer='adam',metrics=accuracy,run_eagerly=True)
     history = ae.fit(data.train.data, data.train.labels, batch_size=FLAGS['batch_size'],epochs=FLAGS['supervised_train_steps'],validation_split=0.1,verbose=True)
     print(ae.summary())
     return ae

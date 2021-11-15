@@ -5,23 +5,21 @@ from utils import *
 from sklearn.cluster import KMeans
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
-def extract_index(labels):
-    indices = labels[:,0]
-    labels_infer = tf.reshape(1-tf.reduce_sum(labels[:,1:],1), (labels.shape[0],1))
-    labels = tf.concat([labels_infer,labels[:,1:]], 1)
-    return indices, labels
-
 def loss_supervised(alpha=0):
     def custom_loss(labels_true,logits_est):
-        indexes = labels_true[:,0]
-#         print(tf.math.subtract(tf.constant([1.0]*labels_true.shape[0]),tf.reduce_sum(labels_true[1:],1)))
+        indices = labels_true[:,0]
         labels = tf.reshape(1-tf.reduce_sum(labels_true[:,1:],1), (labels_true.shape[0],1))
-#         labels = 1-tf.reduce_sum(labels_true[1:],1)
         labels_fixed = tf.concat([labels,labels_true[:,1:]], 1)
         loss_fun = tf.keras.losses.CategoricalCrossentropy()
         value = loss_fun(labels_fixed, logits_est)
         return value
     return custom_loss
+
+def extract_index(labels):
+    indices = labels[:,0]
+    labels_infer = tf.reshape(1-tf.reduce_sum(labels[:,1:],1), (labels.shape[0],1))
+    labels = tf.concat([labels_infer,labels[:,1:]], 1)
+    return indices, labels
 
 def loss_supervised_unsupervised(ae, logits, labels, hidden, M, FLAGS):
     ls, penalty, cross_entropy = loss_supervised(logits, labels, ae, FLAGS.alpha)
@@ -31,9 +29,15 @@ def loss_supervised_unsupervised(ae, logits, labels, hidden, M, FLAGS):
     loss = ls + FLAGS.beta * lk
     return loss, lk, penalty, cross_entropy
 
-def evaluation(logits, labels):
+def accuracy(ind_labels,logits):
+    indices, labels = extract_index(ind_labels)
+    y_pred = tf.argmax(input=logits, axis=1)
+    y_true = tf.argmax(input=labels, axis=1)
+    return accuracy_score(y_pred,y_true)
+
+def evaluation(logits, ind_labels):
     print("logits labels")
-    indices, labels = extract_index(labels)
+    indices, labels = extract_index(ind_labels)
     y_pred = tf.argmax(input=logits, axis=1)
     y_true = tf.argmax(input=labels, axis=1)
     print("accuracy:",accuracy_score(y_pred,y_true))

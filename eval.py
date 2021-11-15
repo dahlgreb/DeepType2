@@ -97,7 +97,7 @@ def do_inference_main(AE, FLAGS):
     true_targets = data.labels
     # get autoencoder acc and predicted targets
     manifold = do_get_hidden(AE,  data, FLAGS['num_hidden_layers'], FLAGS)
-    acc, target_predicted = do_validation(AE, data, FLAGS)
+#     acc, target_predicted = do_validation(AE, data, FLAGS)
     # run KMeans cluster on encoded
     kmeans = KMeans(n_clusters=FLAGS['num_clusters'],init='k-means++', max_iter=50, tol=0.01).fit(manifold)
     assignments = kmeans.predict(manifold)

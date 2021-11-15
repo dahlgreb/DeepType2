@@ -57,5 +57,7 @@ def supervised_1view(data, FLAGS, do_val = True):
     ae.compile(loss=loss_supervised(),optimizer='adam',metrics=accuracy,run_eagerly=True)
     history = ae.fit(data.train.data, data.train.labels, batch_size=FLAGS['batch_size'],epochs=FLAGS['supervised_train_steps'],validation_split=0.1,verbose=True)
     print(ae.summary())
+    y_pred = ae.call(data.test.data)
+    test_metrics(y_pred, data.test.labels)
     return ae
 

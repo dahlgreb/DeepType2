@@ -34,8 +34,8 @@ def main_supervised_1view(FLAGS):
 
 
     # get the manifold
-    data_whole = np.concatenate((data.train.data, data.validation.data, data.test.data), axis = 0)
-    target_whole = np.concatenate((data.train.labels, data.validation.labels, data.test.labels), axis = 0)
+    data_whole = np.concatenate((data.train.data, data.test.data), axis = 0)
+    target_whole = np.concatenate((data.train.labels, data.test.labels), axis = 0)
     data_sets_whole = DataSet(data_whole, target_whole)
     
 #     acc_test, test_pred = test_metrics(ae_supervised,data.test.data,data.test.labels)

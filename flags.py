@@ -19,8 +19,7 @@ def set_flags():
     NUM_CLASSES = 6
     NUM_NODES = [1024, 512]
 
-    NUM_TRAIN_SIZE = 1536
-    NUM_VALIDATION_SIZE = 170
+    NUM_TRAIN_SIZE = 1536+170
     NUM_TEST_SIZE = 427
     NUM_SAMPLE_SIZE = 2133
     NUM_BATCH_SIZE = 256
@@ -43,7 +42,6 @@ def set_flags():
     flags['num_clusters'] = NUM_CLUSTERS # Number of clusters
     flags['dimension'] = NUM_GENES_1 # Number units in input layers
     flags['train_size'] = NUM_TRAIN_SIZE # Number of samples in train set
-    flags['validation_size'] = NUM_VALIDATION_SIZE # Number of samples in validation set
     flags['test_size'] = NUM_TEST_SIZE # Number of samples in test set
     flags['sample_size'] = NUM_SAMPLE_SIZE # Number of whole samples
     

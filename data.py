@@ -68,10 +68,9 @@ def read_data_sets(FLAGS, test = False):
         class DataSets(object):
             pass
         data_sets = DataSets()
-        data_train, data_validation, data_test, targets_train, targets_validation, targets_test = \
+        data_train, data_test, targets_train, targets_test = \
         load_biology_data(FLAGS)
         data_sets.train = DataSet(data_train, targets_train)
-        data_sets.validation = DataSet(data_validation, targets_validation)
         data_sets.test = DataSet(data_test, targets_test)
 
         return data_sets
@@ -109,7 +108,7 @@ def fill_feed_dict_ae_test(data_set, input_pl, target_pl, FLAGS):
 def load_biology_data(FLAGS):
     train_dir = FLAGS['data_file']
     train_size = FLAGS['train_size']
-    validation_size = FLAGS['validation_size']
+#     validation_size = FLAGS['validation_size']
     test_size = FLAGS['test_size']
     dimension = FLAGS['dimension']
 
@@ -140,15 +139,15 @@ def load_biology_data(FLAGS):
     data_train = X[0:train_size, :]
     targets_train = np.float32(Y[0:train_size, :])
 
-    data_validation = X[train_size:train_size+validation_size, :]
-    targets_validation = np.float32(Y[train_size:train_size+validation_size, :])
+#     data_validation = X[train_size:train_size+validation_size, :]
+#     targets_validation = np.float32(Y[train_size:train_size+validation_size, :])
 
-    data_test = X[train_size+validation_size:n_sample, :]
-    targets_test = np.float32(Y[train_size+validation_size:n_sample, :])
+    data_test = X[train_size:n_sample, :]
+    targets_test = np.float32(Y[train_size:n_sample, :])
 
 
 
-    return data_train, data_validation, data_test, targets_train, targets_validation, targets_test
+    return data_train, data_test, targets_train, targets_test
 
 
 def load_biology_data_for_test(FLAGS):

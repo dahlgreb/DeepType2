@@ -78,8 +78,8 @@ def read_data_sets(FLAGS, test = False):
 
 def make_center_set(centers, assignments, FLAGS):
 
-    Ass_matrix = np.zeros([FLAGS['num_train'], FLAGS['num_classes']])
-    for i in range(FLAGS['num_train']):
+    Ass_matrix = np.zeros([FLAGS.num_train, FLAGS.num_classes])
+    for i in range(FLAGS.num_train):
         Ass_matrix[i, assignments[i]] = 1
     center_matrix = np.dot(Ass_matrix, centers)
     center_set = DataSet(center_matrix, Ass_matrix)
@@ -106,11 +106,11 @@ def fill_feed_dict_ae_test(data_set, input_pl, target_pl, FLAGS):
 
 
 def load_biology_data(FLAGS):
-    train_dir = FLAGS['data_file']
-    train_size = FLAGS['train_size']
-#     validation_size = FLAGS['validation_size']
-    test_size = FLAGS['test_size']
-    dimension = FLAGS['dimension']
+    train_dir = FLAGS.data_file
+    train_size = FLAGS.train_size
+#     validation_size = FLAGS.validation_size
+    test_size = FLAGS.test_size
+    dimension = FLAGS.dimension
 
 
     matContents = sio.loadmat(train_dir) # load the data from mat file
@@ -124,7 +124,10 @@ def load_biology_data(FLAGS):
         data[i,:] =(data[i,:] - m1)/(m2 - m1)
 
     targets = matContents['targets']
+    print('sample')
+    print(n_sample)
     index = np.random.permutation(n_sample)
+    print(index)
     data = data[:, index]
     targets = targets[index]
     n_label = len(np.unique(targets))
@@ -151,9 +154,9 @@ def load_biology_data(FLAGS):
 
 
 def load_biology_data_for_test(FLAGS):
-    train_dir = FLAGS['data_file']
+    train_dir = FLAGS.data_file
 
-    dimension = FLAGS['dimension']
+    dimension = FLAGS.dimension
     matContents = sio.loadmat(train_dir) # load the data from mat file
 
     data = matContents['data']

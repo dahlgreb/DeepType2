@@ -13,8 +13,8 @@ if __name__ == '__main__':
     tf.random.set_seed(0)
 
     # Create folders
-    if not os.path.exists(FLAGS['results_dir']):
-        os.makedirs(FLAGS['results_dir'])
+    if not os.path.exists(FLAGS.results_dir):
+        os.makedirs(FLAGS.results_dir)
 
     # create autoencoder and perform training
     

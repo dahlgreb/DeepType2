@@ -12,8 +12,8 @@ if __name__ == '__main__':
     tf.random.set_seed(0)
 
     # Create folders
-    if not os.path.exists(FLAGS['results_dir']):
-        os.makedirs(FLAGS['results_dir'])
+    if not os.path.exists(FLAGS.results_dir):
+        os.makedirs(FLAGS.results_dir)
 
 
     # create autoencoder and perform training
@@ -37,11 +37,11 @@ if __name__ == '__main__':
 
 
     # save mat
-    sio.savemat(FLAGS["results_dir"]+'encoder.mat', {'AE_final':AE_final,'acc_whole': acc_whole,'true_targets': true_targets,
+    sio.savemat(FLAGS.results_dir+'encoder.mat', {'AE_final':AE_final,'acc_whole': acc_whole,'true_targets': true_targets,
         'target_predicted': target_predicted, 'ass_total': ass_total, 'manifold': manifold,'index_total': index_total})
 
     # save pickle
-    pickle_out = open(FLAGS["results_dir"] + 'encoder.pickle', 'wb')
+    pickle_out = open(FLAGS.results_dir + 'encoder.pickle', 'wb')
     pickle.dump([AE_final, acc_whole, target_predicted, ass_total, index_total], pickle_out)
     print('Processing done!')
 

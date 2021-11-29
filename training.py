@@ -43,19 +43,19 @@ def main_supervised_1view(FLAGS):
     return ae_supervised
 
 def supervised_1view(data, FLAGS, do_val = True):
-    if FLAGS['initialize'] == True:
-        file_dir = FLAGS['data_dir'] + 'initialize_encoder.mat'
+    if FLAGS.initialize == True:
+        file_dir = FLAGS.data_dir + 'initialize_encoder.mat'
         matContents = sio.loadmat(file_dir)
         AE_initialize = matContents
 
     print(np.shape(data.train.data), np.shape(data.train.labels))
-    ae_shape = FLAGS['NN_dims_1']
+    ae_shape = FLAGS.NN_dims_1
     input_shape = Input (shape = np.shape(data.train.data)[1:])
     output_shape = Input (shape = np.shape(data.train.labels)[1:])
     print('/////////////////////////////:ae_shape',ae_shape)
     ae = Autoencoder(ae_shape)
-    ae.compile(loss=loss_supervised(),optimizer='adam',metrics=accuracy,run_eagerly=True)
-    history = ae.fit(data.train.data, data.train.labels, batch_size=FLAGS['batch_size'],epochs=FLAGS['supervised_train_steps'],validation_split=0.1,verbose=True)
+    ae.compile(loss=loss_supervised(knowledge_alpha=FLAGS.knowledge_alpha,knowledge_graph=FLAGS.knowledge_graph),optimizer='adam',metrics=accuracy,run_eagerly=True)
+    history = ae.fit(data.train.data, data.train.labels, batch_size=FLAGS.batch_size,epochs=FLAGS.supervised_train_steps,validation_split=0.1,verbose=True)
     print(ae.summary())
     y_pred = ae.call(data.test.data)
     test_metrics(y_pred, data.test.labels)

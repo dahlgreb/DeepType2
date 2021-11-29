@@ -127,18 +127,18 @@ def do_inference_main(AE, FLAGS):
     data, index = read_data_sets(FLAGS, test = True)
     true_targets = data.labels
     # get autoencoder acc and predicted targets
-    manifold = do_get_hidden(AE,  data, FLAGS['num_hidden_layers'], FLAGS)
+    manifold = do_get_hidden(AE,  data, FLAGS.num_hidden_layers, FLAGS)
 #     acc, target_predicted = do_validation(AE, data, FLAGS)
     # run KMeans cluster on encoded
-    kmeans = KMeans(n_clusters=FLAGS['num_clusters'],init='k-means++', max_iter=50, tol=0.01).fit(manifold)
+    kmeans = KMeans(n_clusters=FLAGS.num_clusters,init='k-means++', max_iter=50, tol=0.01).fit(manifold)
     assignments = kmeans.predict(manifold)
     # run transfer tnse pca
-    title = FLAGS['results_dir'] + 'FinalTrainedClusteredFinal'
+    title = FLAGS.results_dir + 'FinalTrainedClusteredFinal'
     types = np.unique(assignments)
     X_TSNE_trained, X_PCA_trained = Transfer_TSNE_PCA(manifold, 2, 3)
     VisualizeHidden(X_TSNE_trained, X_PCA_trained, assignments, types, title)
     labels = np.nonzero(true_targets == 1)[1]
-    title = FLAGS['results_dir'] + 'FinalTrainedFinal'
+    title = FLAGS.results_dir + 'FinalTrainedFinal'
     VisualizeHidden(X_TSNE_trained, X_PCA_trained, labels, types, title)
     return target_predicted,index
 

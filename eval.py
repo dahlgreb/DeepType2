@@ -3,7 +3,7 @@ from data import *
 from model import *
 from utils import *
 from sklearn.cluster import KMeans
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
 
 import pandas as pd
 
@@ -71,6 +71,8 @@ def evaluation(logits, ind_labels):
     indices, labels = extract_index(ind_labels)
     y_pred = tf.argmax(input=logits, axis=1)
     y_true = tf.argmax(input=labels, axis=1)
+    print("Report:")
+    print(classification_report(y_true,y_pred))
     print("accuracy:",accuracy_score(y_pred,y_true))
     print("precision:",precision_score(y_pred,y_true, average="macro"))
     print("recall:",recall_score(y_pred,y_true, average="macro"))
